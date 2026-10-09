@@ -35,3 +35,9 @@ free of Streamlit dependencies.
 
 Race loading skips telemetry because it dominates load time. Head-to-head views
 will fetch fastest-lap car samples only when needed.
+
+## 2026-10-09: Loaders respect explicit cache settings
+
+Loaders call `ensure_cache()` instead of `enable_cache()`, so a caller's custom cache directory or offline
+mode is never reset to the default. This replaced an environment-variable workaround in
+`scripts/precompute.py`.

@@ -46,9 +46,10 @@ separately through `load_fastest_lap_telemetry`. Invalid requests raise
 The cache directory defaults to `data/fastf1_cache` under the current working
 directory. An explicit argument to `enable_cache` overrides `F1COMPANION_CACHE_DIR`,
 which overrides that default. Repeated calls with the same path and offline setting
-are no-ops. The CLI temporarily selects its custom cache through the environment so
-loaders' automatic cache setup uses the same directory.
+are no-ops. Loaders call `ensure_cache()`, which enables the default cache only if nothing has been enabled yet, so
+an explicit `enable_cache(...)` call (custom directory or offline mode) is never overridden.
 
 `list_races` includes dates through today, including a race on today's date; this
 calendar filter does not guarantee that same-day timing data is already available.
-Tests replace the FastF1 entry points with fakes and block socket connections.
+Tests replace the FastF1 entry points with fakes and block socket connections. One
+opt-in test (`pytest -m network`) checks the schemas against real FastF1 data and is excluded from CI.
