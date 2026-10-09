@@ -39,4 +39,5 @@ known-first-party = ["f1companion"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra"
+addopts = "-ra -m 'not network'"
+markers = ["network: hits the real FastF1 API; run with -m network"]

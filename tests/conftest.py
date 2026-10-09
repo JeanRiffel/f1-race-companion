@@ -1,4 +1,4 @@
-"""Prevent accidental network calls and keep cache writes in temporary paths."""
+"""Isolate offline tests; tests marked network are exempt from the guard."""
 
 import socket
 
@@ -9,7 +9,10 @@ from f1companion.data import cache, loader
 
 
 @pytest.fixture(autouse=True)
-def isolate_data(monkeypatch, tmp_path):
+def isolate_data(monkeypatch, tmp_path, request):
+    if request.node.get_closest_marker("network"):
+        return
+
     def blocked(*args, **kwargs):
         raise AssertionError("network access in tests")
 
