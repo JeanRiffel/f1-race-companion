@@ -20,5 +20,5 @@ def isolate_data(monkeypatch, tmp_path):
     monkeypatch.setattr(socket.socket, "connect", blocked)
     monkeypatch.setattr(socket.socket, "connect_ex", blocked)
     monkeypatch.setenv("F1COMPANION_CACHE_DIR", str(tmp_path / "cache"))
-    monkeypatch.setattr(loader, "enable_cache", lambda: tmp_path / "cache")
+    monkeypatch.setattr(loader, "ensure_cache", lambda: tmp_path / "cache")
     monkeypatch.setattr(cache, "_enabled", None)

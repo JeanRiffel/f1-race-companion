@@ -12,7 +12,14 @@ from fastf1.exceptions import (
 )
 from requests.exceptions import ConnectionError, Timeout
 
-from f1companion.data import DataUnavailableError, F1DataError, RaceData, RaceNotFoundError, loader
+from f1companion.data import (
+    DataUnavailableError,
+    F1DataError,
+    RaceData,
+    RaceNotFoundError,
+    cache,
+    loader,
+)
 
 _SESSION = loader._get_session
 _SCHEDULE = loader._get_schedule
@@ -165,3 +172,18 @@ def test_source_seams(monkeypatch, session, raw_schedule):
     assert _SCHEDULE(2024) is raw_schedule
     assert session_calls == [(2024, 1, "R")]
     assert schedule_calls == [((2024,), {"include_testing": False})]
+
+
+def test_load_race_keeps_explicit_cache_settings(monkeypatch, session, tmp_path):
+    calls = []
+    monkeypatch.setattr(fastf1.Cache, "enable_cache", lambda path: calls.append(path))
+    monkeypatch.setattr(fastf1.Cache, "offline_mode", lambda offline: None)
+    monkeypatch.setattr(fastf1, "set_log_level", lambda level: None)
+    monkeypatch.setattr(loader, "ensure_cache", cache.ensure_cache)
+    monkeypatch.setattr(loader, "_get_session", lambda y, r: session)
+    explicit = tmp_path / "explicit"
+    cache.enable_cache(explicit, offline=True)
+    loader.load_race(2024, 1)
+    loader.load_fastest_lap_telemetry(2024, 1, "VER")
+    assert cache._enabled == (explicit.resolve(), True)
+    assert calls == [str(explicit.resolve())]

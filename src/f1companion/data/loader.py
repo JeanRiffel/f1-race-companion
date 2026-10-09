@@ -14,7 +14,7 @@ from fastf1.exceptions import (
 )
 from requests.exceptions import ConnectionError, Timeout
 
-from .cache import enable_cache
+from .cache import ensure_cache
 from .errors import DataUnavailableError, F1DataError, RaceNotFoundError
 from .models import RaceData, RaceInfo
 from .normalize import (
@@ -63,7 +63,7 @@ def _translate(message: str, *, invalid_value: bool = False) -> Iterator[None]:
 
 def list_races(year: int, *, today: date | None = None) -> pd.DataFrame:
     """List completed race dates in a season."""
-    enable_cache()
+    ensure_cache()
     with _translate(f"No races found for {year}.", invalid_value=True):
         raw = _get_schedule(year)
     return normalize_schedule(raw, today if today is not None else date.today())
@@ -78,7 +78,7 @@ def _optional(session: fastf1.core.Session, name: str) -> pd.DataFrame | None:
 
 def load_race(year: int, round_number: int) -> RaceData:
     """Load a race without the expensive telemetry payload."""
-    enable_cache()
+    ensure_cache()
     message = f"No race found for round {round_number} of {year}."
     with _translate(message, invalid_value=True):
         session = _get_session(year, round_number)
@@ -108,7 +108,7 @@ def load_race(year: int, round_number: int) -> RaceData:
 
 def load_fastest_lap_telemetry(year: int, round_number: int, driver: str) -> pd.DataFrame:
     """Load a driver's fastest valid lap as distance-indexed car samples."""
-    enable_cache()
+    ensure_cache()
     message = f"No race found for round {round_number} of {year}."
     with _translate(message, invalid_value=True):
         session = _get_session(year, round_number)

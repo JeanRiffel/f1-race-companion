@@ -1,7 +1,6 @@
 """CLI success, failure continuation, and cache path selection."""
 
 import importlib.util
-import os
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -18,7 +17,7 @@ def cli(monkeypatch):
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    monkeypatch.setattr(module, "enable_cache", lambda: None)
+    monkeypatch.setattr(module, "enable_cache", lambda cache_dir=None: None)
     return module
 
 
@@ -45,18 +44,28 @@ def test_continue(cli, monkeypatch, capsys, failure):
 
 
 def test_explicit_rounds_and_cache(cli, monkeypatch, tmp_path):
-    seen = []
-    old = os.environ["F1COMPANION_CACHE_DIR"]
+    enabled, seen = [], []
     path = str(tmp_path / "custom")
+    monkeypatch.setattr(cli, "enable_cache", lambda cache_dir=None: enabled.append(cache_dir))
 
     def load(year, round_number):
-        seen.append((round_number, os.environ["F1COMPANION_CACHE_DIR"]))
+        seen.append(round_number)
         return SimpleNamespace(info=SimpleNamespace(event_name="Race"))
 
     monkeypatch.setattr(cli, "load_race", load)
     assert cli.main(["--year", "2024", "--rounds", "5", "1", "--cache-dir", path]) == 0
-    assert seen == [(5, path), (1, path)]
-    assert os.environ["F1COMPANION_CACHE_DIR"] == old
+    assert enabled == [path]
+    assert seen == [5, 1]
+
+
+def test_default_cache_dir(cli, monkeypatch):
+    enabled = []
+    monkeypatch.setattr(cli, "enable_cache", lambda cache_dir=None: enabled.append(cache_dir))
+    monkeypatch.setattr(
+        cli, "load_race", lambda y, r: SimpleNamespace(info=SimpleNamespace(event_name="Race"))
+    )
+    assert cli.main(["--year", "2024", "--rounds", "1"]) == 0
+    assert enabled == [None]
 
 
 def test_schedule_failure(cli, monkeypatch, capsys):
