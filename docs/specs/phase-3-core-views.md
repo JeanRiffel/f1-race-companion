@@ -216,8 +216,10 @@ Cached wrappers; this is the only app module that imports `f1companion.data`:
 @st.cache_data(ttl=3600, show_spinner="Loading the calendar...")
 def get_races(year: int) -> pd.DataFrame: ...
 
+
 @st.cache_data(show_spinner="Loading race data (the first load of a race can take a minute)...")
 def get_race(year: int, round_number: int) -> RaceData: ...
+
 
 @st.cache_data(show_spinner="Loading telemetry...")
 def get_telemetry(year: int, round_number: int, driver: str) -> pd.DataFrame: ...
