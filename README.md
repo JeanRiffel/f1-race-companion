@@ -27,6 +27,12 @@ pip install -e ".[dev]"
 streamlit run app/main.py
 ```
 
+Optionally warm the disk cache for a season:
+
+```bash
+python scripts/precompute.py --year 2024
+```
+
 Checks:
 
 ```bash
