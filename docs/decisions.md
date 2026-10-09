@@ -41,3 +41,43 @@ will fetch fastest-lap car samples only when needed.
 Loaders call `ensure_cache()` instead of `enable_cache()`, so a caller's custom cache directory or offline
 mode is never reset to the default. This replaced an environment-variable workaround in
 `scripts/precompute.py`.
+
+## 2026-10-09: Explicit navigation with a shared shell
+
+Use `st.navigation` with three explicit `st.Page` entries in `app/pages/` rather
+than automatic discovery. Race selectors live in the entrypoint so the same sidebar
+runs on every page in the real app. Driver widgets stay in the comparison page.
+
+## 2026-10-09: Approximate events from project-schema laps
+
+Neutralisations come from lap-level `TrackStatus`, and retirements come from the
+classification. This keeps analysis independent of upstream timestamp formats, but
+a condition beginning mid-lap marks the whole lap; the recap explains this limit.
+
+## 2026-10-09: Dashed teammate traces
+
+Drivers keep their supplied team colour. The second driver sharing a colour uses
+a dashed line so position and telemetry comparisons remain distinguishable.
+
+## 2026-10-09: Durable selection and navigation testing
+
+[Streamlit documents that query parameters can clear when changing pages](https://docs.streamlit.io/develop/api-reference/caching-and-state/st.query_params).
+Keep race and driver choices separately from widget state, and rewrite their URL
+parameters on every shell run. AppTest 1.64.0 can render registered file pages, but
+its fresh PagesManager selects the child script directly on a switch, omitting the
+entrypoint; tests therefore cover child pages and shell restoration separately,
+and full browser navigation remains a reviewer check.
+
+## 2026-10-09: Pure pit-stop summary helper
+
+The strategy view needs stop counts and lap lists for every classified driver,
+including zero-stop drivers. Add `pit_stop_summary` to the analysis layer so pages
+only arrange results instead of grouping DataFrames themselves.
+
+## 2026-10-09: Preserve the phase 2 telemetry contract
+
+Phase 3 metrics filter accurate, undeleted laps, while the existing telemetry
+loader selects the source's recorded personal best without an explicit accuracy
+filter. Keep the data layer unchanged as required by the spec and explain the
+possible difference in the comparison caption. Matching the telemetry lap to the
+metric needs reviewer guidance recorded in `docs/phase-3-questions.md`.

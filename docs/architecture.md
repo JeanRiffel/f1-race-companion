@@ -53,3 +53,54 @@ an explicit `enable_cache(...)` call (custom directory or offline mode) is never
 calendar filter does not guarantee that same-day timing data is already available.
 Tests replace the FastF1 entry points with fakes and block socket connections. One
 opt-in test (`pytest -m network`) checks the schemas against real FastF1 data and is excluded from CI.
+
+## Core analysis
+
+Analysis functions accept project-schema DataFrames, preserve inputs, and return
+plain DataFrames with explicit dtypes. Optional values and empty frames are handled
+without importing presentation or network libraries.
+
+| Module | Responsibility |
+|---|---|
+| `analysis/recap.py` | Starting grid, lap positions, final results, driver colours, approximate key events |
+| `analysis/strategy.py` | Tyre stints, numbered pit stops, finishing-order stop summary |
+| `analysis/head_to_head.py` | Accurate undeleted fastest laps and distance-grid interpolation |
+| `analysis/formatting.py` | Readable lap times rounded to milliseconds |
+
+## Charts
+
+Chart builders accept analysis outputs and return Plotly figures. They use no fixed
+width or page/background colour. Driver colours are supplied by callers, teammates
+use dashed lines, and empty inputs return annotated figures.
+
+| Module | Responsibility |
+|---|---|
+| `charts/theme.py` | Compound colours, fallback driver colour, horizontal legend, empty figures |
+| `charts/positions.py` | Position traces, starting grid at lap zero, leader on top |
+| `charts/strategy.py` | Horizontal compound traces in finishing order |
+| `charts/telemetry.py` | Shared-distance speed, throttle, and step-line brake traces |
+
+## App
+
+| Module | Responsibility |
+|---|---|
+| `app/main.py` | Shared race selector, season fallback, URL state, explicit navigation |
+| `app/services.py` | Cached public data API wrappers and friendly known-error presentation |
+| `app/components/race_header.py` | Race title, location/date, shared disclaimer |
+| `app/pages/recap.py` | Final classification, position chart, key events and explanations |
+| `app/pages/strategy.py` | Tyre timeline and complete driver pit-stop summary |
+| `app/pages/head_to_head.py` | Driver selection, lap-time metrics, separate telemetry requests |
+
+FastF1's disk cache remains in the data layer; `st.cache_data` now wraps the public
+API in `app/services.py`. Calendars expire after one hour; race and per-driver
+telemetry use separate cache keys. Known data failures propagate without being
+cached and are displayed as short messages.
+
+The shell accepts `year` and `round` on initial load, rejects invalid values, and
+keeps the selected race in session state. It rewrites race query parameters after
+navigation on each shell run and preserves unrelated parameters, including repeated
+values. The head-to-head page owns `d1` and `d2`; its driver selection is saved
+separately from widget state and scoped to the race. The shell preserves initial
+driver URL values and restores saved driver choices when navigation clears query
+parameters. See the AppTest limitation in `docs/decisions.md` and browser checks
+still required in `docs/phase-3-review.md`.

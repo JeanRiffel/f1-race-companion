@@ -8,13 +8,13 @@ Understand any Formula 1 race in under a minute: what happened, why, and who was
 
 ## Features
 
-Planned for the MVP:
+MVP progress:
 
-- **Race recap:** position changes by lap, final results, safety cars and retirements
-- **Strategy:** tire stints and pit stops per driver as a timeline
-- **Head-to-head:** compare two drivers' fastest laps (speed, throttle, brake by distance)
-- **Race pace analysis:** tire degradation per compound and race pace vs. finishing position
-- **Story of the race:** a short plain-English summary generated from the data
+- [x] **Race recap:** position changes by lap, final results, safety cars and retirements
+- [x] **Strategy:** tire stints and pit stops per driver as a timeline
+- [x] **Head-to-head:** compare two drivers' fastest laps (speed, throttle, brake by distance)
+- [ ] **Race pace analysis:** tire degradation per compound and race pace vs. finishing position
+- [ ] **Story of the race:** a short plain-English summary generated from the data
 
 ## Run locally
 
