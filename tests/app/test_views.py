@@ -9,6 +9,12 @@ from factories import race_data, telemetry
 from streamlit.testing.v1 import AppTest
 
 
+def param(app, name):
+    """Return a query param as a list; AppTest returns a bare string in older Streamlit."""
+    value = app.query_params[name]
+    return [value] if isinstance(value, str) else list(value)
+
+
 def shell(**query):
     app = AppTest.from_file(str(APP / "main.py"), default_timeout=15)
     app.query_params.update(query)
@@ -44,7 +50,7 @@ def test_bad_query_falls_back(app_services, year, round_number):
     app = shell(year=year, round=round_number, custom="kept")
     assert not app.exception
     assert app.session_state["race_key"] == (date.today().year, 5)
-    assert app.query_params["custom"] == ["kept"]
+    assert param(app, "custom") == ["kept"]
 
 
 def test_query_round_trip(app_services):
@@ -77,7 +83,7 @@ def test_selection_survives_navigation_and_param_clear(app_services):
     app.switch_page("pages/head_to_head.py").run()
     assert not app.exception
     assert app.session_state["driver_selection"] == ((2023, 1), "CCC", "BBB")
-    assert app.query_params["d1"] == ["CCC"]
+    assert param(app, "d1") == ["CCC"]
 
 
 def test_shell_restores_params_after_clear(app_services):
@@ -86,17 +92,17 @@ def test_shell_restores_params_after_clear(app_services):
     app.query_params.clear()
     app.run()
     assert not app.exception
-    assert app.query_params["year"] == ["2023"]
-    assert app.query_params["round"] == ["1"]
-    assert app.query_params["d1"] == ["CCC"]
-    assert app.query_params["d2"] == ["BBB"]
+    assert param(app, "year") == ["2023"]
+    assert param(app, "round") == ["1"]
+    assert param(app, "d1") == ["CCC"]
+    assert param(app, "d2") == ["BBB"]
 
 
 def test_shell_preserves_other_params(app_services):
     app = shell(year="2023", round="1", custom=["one", "two"])
     app.selectbox(key="selector_round_2023").set_value(5).run()
     assert not app.exception
-    assert app.query_params["custom"] == ["one", "two"]
+    assert param(app, "custom") == ["one", "two"]
 
 
 def test_year_and_round_changes(app_services):
@@ -106,7 +112,7 @@ def test_year_and_round_changes(app_services):
     assert app.session_state["race_key"] == (2022, 5)
     app.selectbox(key="selector_round_2022").set_value(1).run()
     assert app.session_state["race_key"] == (2022, 1)
-    assert app.query_params["round"] == ["1"]
+    assert param(app, "round") == ["1"]
 
 
 def test_empty_season_fallback(app_services, monkeypatch):
