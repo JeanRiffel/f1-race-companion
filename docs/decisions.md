@@ -80,4 +80,7 @@ Phase 3 metrics filter accurate, undeleted laps, while the existing telemetry
 loader selects the source's recorded personal best without an explicit accuracy
 filter. Keep the data layer unchanged as required by the spec and explain the
 possible difference in the comparison caption. Matching the telemetry lap to the
-metric needs reviewer guidance recorded in `docs/phase-3-questions.md`.
+metric is a known limitation. FastF1's personal-best flags already exclude deleted
+laps, and no mismatch appeared on 2018 to 2024 races checked by hand. If one shows up,
+the follow-up is a data-layer change that returns the lap number and loads telemetry
+for the exact analysed lap, in its own PR with tests.

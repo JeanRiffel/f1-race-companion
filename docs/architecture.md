@@ -102,5 +102,4 @@ navigation on each shell run and preserves unrelated parameters, including repea
 values. The head-to-head page owns `d1` and `d2`; its driver selection is saved
 separately from widget state and scoped to the race. The shell preserves initial
 driver URL values and restores saved driver choices when navigation clears query
-parameters. See the AppTest limitation in `docs/decisions.md` and browser checks
-still required in `docs/phase-3-review.md`.
+parameters. See the AppTest limitation in `docs/decisions.md`.
