@@ -84,3 +84,12 @@ metric is a known limitation. FastF1's personal-best flags already exclude delet
 laps, and no mismatch appeared on 2018 to 2024 races checked by hand. If one shows up,
 the follow-up is a data-layer change that returns the lap number and loads telemetry
 for the exact analysed lap, in its own PR with tests.
+
+## 2026-10-11: `AGENTS.md` as the shared agent contract
+
+Claude Code and Codex both work on this repo, so engineering rules live in one
+tool-agnostic `AGENTS.md`, which Codex reads natively. `CLAUDE.md` imports it with
+`@AGENTS.md` and only adds Claude-specific notes, so the rules cannot drift between
+tools. Roles (planner, implementer, reviewer) are assigned per spec rather than per
+tool, and concurrent agents use separate worktrees. No orchestration tooling yet:
+hand-offs go through specs, commits, and PRs.

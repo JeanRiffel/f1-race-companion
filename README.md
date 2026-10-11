@@ -45,6 +45,10 @@ pytest
 
 Data → analysis → charts → UI. The UI never calls FastF1 directly, and analysis functions are pure so they are easy to test. See [docs/architecture.md](docs/architecture.md) and [docs/decisions.md](docs/decisions.md).
 
+## Contributing
+
+Start with [docs/onboarding.md](docs/onboarding.md). Rules for humans and AI coding agents are in [AGENTS.md](AGENTS.md); feature specs live in [docs/specs/](docs/specs/README.md).
+
 ## Tech stack
 
 Python, [FastF1](https://docs.fastf1.dev), pandas, numpy, Streamlit, Plotly, pytest, ruff, GitHub Actions.
